@@ -1,0 +1,3 @@
+[submodule "lib/jquery.observable"]
+	path = lib/jquery.observable
+	url = git://github.com/crystal88/jquery.observable.git
