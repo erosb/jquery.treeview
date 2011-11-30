@@ -2,14 +2,24 @@
 	
 	var publicMethods = {
 		destroy: function() {
-			$(this).empty().data("treeview-options", null);
+			$(this).empty().data("ui-treeview-options", null);
 		}
 	};
 	
 	var eventHandlers = {
-		onNodeClick: function() {
-			console.log($.observable.remove($(this).data('ui-treeview-nodemodel')));
-			$(this).parent().find('> ul').show();
+		onNodeClick: function(e, ui) {
+			var childNodes = $(this).parent().find('> ul');
+			var options = privateMethods.fetchOptions(this);
+			if ( $.isFunction(options.onNodeClick) ) {
+				options.onNodeClick.call(this, $(this).data('ui-treeview-nodemodel'), e)
+			}
+			if (childNodes.length > 0) {
+				if (childNodes.is(":visible") ) {
+					childNodes.hide();
+				} else {
+					childNodes.show();
+				}
+			}
 		}
 	};
 	
@@ -22,7 +32,7 @@
 		updateNodeList: function(nodeList, DOMCtx) {
 			DOMCtx = $(DOMCtx).empty();
 			for (var i = 0; i < nodeList().length; ++i) {
-				this.updateNode( nodeList(i), DOMCtx.append('<li></li>').find('li:last') );
+				this.updateNode( nodeList(i), DOMCtx.append('<li style="list-style-type: none"></li>').find('li:last') );
 			}	
 		},
 		updateNode: function(nodeModel, DOMCtx) {
@@ -37,6 +47,17 @@
 			if (nodeModel().childNodes !== undefined && nodeModel().childNodes() !== null) {
 				this.updateNodeList(nodeModel().childNodes, DOMCtx.append('<ul></ul>').find('> ul'));
 			}
+		},
+		fetchOptions: function(nodeDOMElem) {
+			var current = $(nodeDOMElem);
+			while(current) {
+				var candidate = current.data("ui-treeview-options");
+				if (candidate)
+					return candidate;
+					
+				current = current.parent();
+			}
+			return null;
 		}
 	};
 	
@@ -56,11 +77,11 @@
 		}
 		
 		if (isConstructor) {
-			var existingOptions = $(this).data('treeview-options');
+			var existingOptions = $(this).data('ui-treeview-options');
 			if (existingOptions)
 				throw "can not create multiple treeviews in the same DOM element";
 				
-			$(this).data('treeview-options', options);
+			$(this).data('ui-treeview-options', options);
 			
 			$(this).empty()
 				.addClass('ui-widget')
@@ -93,6 +114,7 @@
 			publicMethods[methodName].apply(this, args);
 		}
 		
+		return this;
 	}
 	
 })(jQuery);
