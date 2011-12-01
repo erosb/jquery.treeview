@@ -31,6 +31,18 @@
 		},
 		updateNodeList: function(nodeList, DOMCtx) {
 			DOMCtx = $(DOMCtx).empty();
+			if ( ! nodeList.uiTreeviewManaged) {
+				nodeList.on(["push"
+					, "elemchange"
+					, "pop"
+					, "reverse"
+					, "shift"
+					, "unshift"]
+					, function(newVal) {
+						privateMethods.updateNodeList(nodeList, DOMCtx);
+					});
+				nodeList.uiTreeviewManaged = true;
+			}
 			for (var i = 0; i < nodeList().length; ++i) {
 				this.updateNode( nodeList(i), DOMCtx.append('<li style="list-style-type: none"></li>').find('li:last') );
 			}	
@@ -43,6 +55,13 @@
 				.text(title)
 				.data('ui-treeview-nodemodel', nodeModel)
 				.click(eventHandlers.onNodeClick);
+			
+			if ( ! nodeModel().title.uiTreeviewManaged) {
+				nodeModel().title.on("change", function(newVal, oldVal) {
+					DOMCtx.find("> span:first").html(newVal);
+				});
+				nodeModel().title.uiTreeviewManaged = true;
+			}
 				
 			if (nodeModel().childNodes !== undefined && nodeModel().childNodes() !== null) {
 				this.updateNodeList(nodeModel().childNodes, DOMCtx.append('<ul></ul>').find('> ul'));

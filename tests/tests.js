@@ -89,6 +89,56 @@ test("onNodeClick", function() {
 	
 	ok(called, "onNodeClick fired");
 	
+	$("#treeview").treeview("destroy");
+});
+
+module("Data change handling");
+
+test("title change", function() {
+	var model = $.observable({
+		title: "jquery.treeview demo",
+		childNodes: [
+			{
+				title: 'root node 01'
+			},
+			{
+				title: 'root node 02'
+			}
+		],
+	});
+	
+	$("#treeview").treeview({
+		dataModel: model
+	});
+	
+	model().childNodes(0)().title("new title");
+	
+	same($("#treeview > ul > li:first > span").html(), "new title", "title change handled properly");
+	$("#treeview").treeview("destroy");
+});
+
+test("nodelist change", function() {
+	var model = $.observable({
+		title: "jquery.treeview demo",
+		childNodes: [
+			{
+				title: 'root node 01'
+			},
+			{
+				title: 'root node 02'
+			}
+		],
+	});
+	
+	$("#treeview").treeview({
+		dataModel: model
+	});
+	model().childNodes.push({
+		title: "root node 03"
+	});
+	
+	same($("#treeview > ul > li:eq(2) > span").html(), "root node 03", "nodelist change handled properly");
+	//$("#treeview").treeview("destroy");
 });
 
 
