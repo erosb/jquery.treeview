@@ -1,3 +1,7 @@
 .ui-treeview-nodetitle {
 	cursor: pointer;
 }
+
+.ui-treeview-emptyleaf {
+	background-position: 20px 20px
+}

@@ -1,5 +1,7 @@
 (function( $ ) {
 	
+	"use strict";
+	
 	var publicMethods = {
 		destroy: function() {
 			$(this).empty().data("ui-treeview-options", null);
@@ -11,20 +13,27 @@
 			var childNodes = $(this).parent().find('> ul');
 			var options = privateMethods.fetchOptions(this);
 			if ( $.isFunction(options.onNodeClick) ) {
-				options.onNodeClick.call(this, $(this).data('ui-treeview-nodemodel'), e)
+				options.onNodeClick.call(this, $(this).data('ui-treeview-nodemodel'), e);
 			}
 			if (childNodes.length > 0) {
 				if (childNodes.is(":visible") ) {
 					childNodes.hide();
 					$(this).parent().find('> span.ui-icon')
 						.removeClass(options.openedNodeClass)
-						.addClass(options.closedNodeClass)
+						.addClass(options.closedNodeClass);
 				} else {
 					childNodes.show();
 					$(this).parent().find('> span.ui-icon')
 						.removeClass(options.closedNodeClass)
-						.addClass(options.openedNodeClass)
+						.addClass(options.openedNodeClass);
 				}
+			}
+		},
+		onCheckboxChange: function() {
+			var options = privateMethods.fetchOptions(this);
+			if ( $.isFunction(options.onCheckboxChange) ) {
+				options.onCheckboxChange.call(this, $(this).val() ? true : false
+					, $(this).data('ui-treeview-nodemodel'));
 			}
 		}
 	};
@@ -33,7 +42,7 @@
 		attachEventHandlers: function(nodeModel, DOMCtx) {
 			nodeModel().title.on('change', function(newVal) {
 				$(DOMCtx).parent().find('> .ui-treeview-title').html(newVal);
-			})
+			});
 		},
 		updateNodeList: function(nodeList, DOMCtx) {
 			DOMCtx = $(DOMCtx).empty();
@@ -64,8 +73,36 @@
 				iconClass = options.leafNodeClass;
 			}
 			
-			DOMCtx.append('<span class="ui-icon ' + iconClass + '" style="display:inline-block">' 
-					+ '</span><span class="ui-treeview-nodetitle"></span>')
+			DOMCtx.append('<span class="ui-icon ' + iconClass + '" style="display:inline-block">');
+			if (options.checkable) {
+				var chkBox = DOMCtx.append('<input type="checkbox"/>')
+					.find('input[type=checkbox]')
+					.data('ui-treeview-nodemodel', nodeModel);
+				if ( $.isFunction(options.onCheckboxChange) ) {
+					chkBox.change(eventHandlers.onCheckboxChange);
+				}
+				if (options.bindCheckboxesTo) {
+					var currVal = nodeModel()[options.bindCheckboxesTo]();
+					if (currVal === undefined) {
+						currVal = null;
+					}
+					if (true === currVal) {
+						chkBox.attr('checked', 'checked');
+					} else if (false === currVal) {
+						// nothing to do here
+					} else if (null === currVal) {
+						
+					}
+					nodeModel()[options.bindCheckboxesTo].on("change", function(newVal) {
+						if (true === newVal) {
+							chkBox.attr("checked", true);
+						} else if (false === newVal) {
+							chkBox.attr("checked", false);
+						}
+					});
+				}
+			}
+			DOMCtx.append('</span><span class="ui-treeview-nodetitle"></span>')
 				.find('> span:eq(1)')
 				.text(title)
 				.data('ui-treeview-nodemodel', nodeModel)
@@ -88,9 +125,9 @@
 			var current = $(nodeDOMElem);
 			while(current) {
 				var candidate = current.data("ui-treeview-options");
-				if (candidate)
+				if (candidate) {
 					return candidate;
-					
+				}
 				current = current.parent();
 			}
 			return null;
@@ -103,22 +140,26 @@
 			dataSource: null,
 			closedNodeClass: 'ui-icon-carat-1-e',
 			openedNodeClass: 'ui-icon-carat-1-s',
-			leafNodeClass: 'ui-icon-bullet'
+			leafNodeClass: 'ui-treeview-emptyleaf',
+			checkable: false,
+			onCheckboxChange: null,
+			bindCheckboxesTo: null
 		};
 		
 		var isConstructor = false;
 		
-		if (arguments.length == 1 && $.isPlainObject(arguments[0]) ) {
+		if (arguments.length === 1 && $.isPlainObject(arguments[0]) ) {
 			options = $.extend(options, arguments[0]);
 			isConstructor = true;
-		} else if (arguments.length == 0) {
+		} else if (arguments.length === 0) {
 			isConstructor = true;
 		}
 		
 		if (isConstructor) {
 			var existingOptions = $(this).data('ui-treeview-options');
-			if (existingOptions)
+			if (existingOptions) {
 				throw "can not create multiple treeviews in the same DOM element";
+			}
 				
 			$(this).data('ui-treeview-options', options);
 			
@@ -143,8 +184,9 @@
 			
 		} else {
 			var methodName = arguments[ 0 ];
-			if ( ! publicMethods[methodName] )
+			if ( ! publicMethods[methodName] ) {
 				throw "treeview doesn't have method '" + methodName + "'";
+			}
 				
 			var args = [];
 			for (var i = 1; i < arguments.length; ++i) {
@@ -154,6 +196,6 @@
 		}
 		
 		return this;
-	}
+	};
 	
 })(jQuery);
