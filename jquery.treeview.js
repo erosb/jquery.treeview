@@ -16,8 +16,14 @@
 			if (childNodes.length > 0) {
 				if (childNodes.is(":visible") ) {
 					childNodes.hide();
+					$(this).parent().find('> span.ui-icon')
+						.removeClass(options.openedNodeClass)
+						.addClass(options.closedNodeClass)
 				} else {
 					childNodes.show();
+					$(this).parent().find('> span.ui-icon')
+						.removeClass(options.closedNodeClass)
+						.addClass(options.openedNodeClass)
 				}
 			}
 		}
@@ -49,16 +55,25 @@
 		},
 		updateNode: function(nodeModel, DOMCtx) {
 			DOMCtx = $(DOMCtx).empty();
+			var options = this.fetchOptions(DOMCtx);
 			var title = ($.isFunction(nodeModel().title) && nodeModel().title()) || '';
-			DOMCtx.append('<span></span>')
-				.find('> span:first')
+			var iconClass = null;
+			if (nodeModel().childNodes !== undefined && nodeModel().childNodes() !== null) {
+				iconClass = options.closedNodeClass;
+			} else {
+				iconClass = options.leafNodeClass;
+			}
+			
+			DOMCtx.append('<span class="ui-icon ' + iconClass + '" style="display:inline-block">' 
+					+ '</span><span class="ui-treeview-nodetitle"></span>')
+				.find('> span:eq(1)')
 				.text(title)
 				.data('ui-treeview-nodemodel', nodeModel)
 				.click(eventHandlers.onNodeClick);
 			
 			if ( ! nodeModel().title.uiTreeviewManaged) {
 				nodeModel().title.on("change", function(newVal, oldVal) {
-					DOMCtx.find("> span:first").html(newVal);
+					DOMCtx.find("> span:eq(1)").html(newVal);
 				});
 				nodeModel().title.uiTreeviewManaged = true;
 			}
@@ -83,7 +98,10 @@
 	$.fn.treeview = function() {
 		var options = {
 			dataModel: null,
-			dataSource: null
+			dataSource: null,
+			closedNodeClass: 'ui-icon-carat-1-e',
+			openedNodeClass: 'ui-icon-carat-1-s',
+			leafNodeClass: 'ui-icon-bullet'
 		};
 		
 		var isConstructor = false;
