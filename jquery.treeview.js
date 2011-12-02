@@ -70,6 +70,8 @@
 				.text(title)
 				.data('ui-treeview-nodemodel', nodeModel)
 				.click(eventHandlers.onNodeClick);
+				
+			DOMCtx.find('> span.ui-icon').click(eventHandlers.onNodeClick);
 			
 			if ( ! nodeModel().title.uiTreeviewManaged) {
 				nodeModel().title.on("change", function(newVal, oldVal) {

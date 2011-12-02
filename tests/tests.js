@@ -60,9 +60,9 @@ test("Rendering testing", function() {
 	
 	same($("#treeview > ul > li").length, 2, "root node <li> tags");
 	same($("#treeview > ul > li > ul > li > ul > li > span.ui-treeview-nodetitle").html(), "node 01 01 01", "recursive node rendering");
-//	$("#treeview").treeview("destroy");
+	$("#treeview").treeview("destroy");
 });
-/*
+
 module("Event handling");
 
 test("onNodeClick", function() {
