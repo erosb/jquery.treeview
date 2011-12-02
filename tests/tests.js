@@ -236,7 +236,7 @@ test("checkbox bound property change", function() {
 			},
 			{
 				title: 'root node 02',
-				selected: false
+				selected: null
 			}
 		],
 	});
@@ -255,7 +255,7 @@ test("checkbox bound property change", function() {
 	
 	same($("#treeview  input:first").attr('checked'), undefined);
 	
-	$("#treeview").treeview("destroy");
+	//$("#treeview").treeview("destroy");
 });
 
 
