@@ -1,7 +1,16 @@
 .ui-treeview-nodetitle {
 	cursor: pointer;
+	height: 16px;
+	line-height: 16px;
+	vertical-align: center;
+	margin-left: 8px
 }
 
-.ui-treeview-emptyleaf {
+.ui-treeview-emptyicon {
 	background-position: 20px 20px
+}
+
+span.checkbox {
+	display: inline-block;
+	border: 1px solid lightgrey;
 }

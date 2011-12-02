@@ -29,11 +29,26 @@
 				}
 			}
 		},
-		onCheckboxChange: function() {
+		onCheckboxClick: function() {
+			var val = null;
+			if ($(this).hasClass("ui-icon-check")) {
+				val = false;
+			} else if ($(this).hasClass("ui-treeview-emptyicon")  || $(this).hasClass("ui-icon-minus")) {
+				val = true;
+			}
+			privateMethods.renderCheckboxValue(this, val);
+			var nodeModel = $(this).data('ui-treeview-nodemodel');
 			var options = privateMethods.fetchOptions(this);
+			
+			if (options.bindCheckboxesTo !== null) {
+				if ( nodeModel()[options.bindCheckboxesTo] ) {
+					nodeModel()[options.bindCheckboxesTo](val);
+				}
+			}
+			
 			if ( $.isFunction(options.onCheckboxChange) ) {
-				options.onCheckboxChange.call(this, $(this).val() ? true : false
-					, $(this).data('ui-treeview-nodemodel'));
+				options.onCheckboxChange.call(this, val
+					, nodeModel);
 			}
 		}
 	};
@@ -74,36 +89,23 @@
 			}
 			
 			DOMCtx.append('<span class="ui-icon ' + iconClass + '" style="display:inline-block">');
+			
 			if (options.checkable) {
-				var chkBox = DOMCtx.append('<input type="checkbox"/>')
-					.find('input[type=checkbox]')
+				var chkBox = DOMCtx.append('<span class="ui-icon checkbox"></span>')
+					.find('span.checkbox')
 					.data('ui-treeview-nodemodel', nodeModel);
 				if ( $.isFunction(options.onCheckboxChange) ) {
-					chkBox.change(eventHandlers.onCheckboxChange);
+					chkBox.click(eventHandlers.onCheckboxClick);
 				}
 				if (options.bindCheckboxesTo) {
-					var currVal = nodeModel()[options.bindCheckboxesTo]();
-					if (currVal === undefined) {
-						currVal = null;
-					}
-					if (true === currVal) {
-						chkBox.attr('checked', 'checked');
-					} else if (false === currVal) {
-						// nothing to do here
-					} else if (null === currVal) {
-						
-					}
+					this.renderCheckboxValue( chkBox, nodeModel()[options.bindCheckboxesTo]() );
 					nodeModel()[options.bindCheckboxesTo].on("change", function(newVal) {
-						if (true === newVal) {
-							chkBox.attr("checked", true);
-						} else if (false === newVal) {
-							chkBox.attr("checked", false);
-						}
+						privateMethods.renderCheckboxValue(chkBox, newVal);
 					});
 				}
 			}
 			DOMCtx.append('</span><span class="ui-treeview-nodetitle"></span>')
-				.find('> span:eq(1)')
+				.find('> span.ui-treeview-nodetitle')
 				.text(title)
 				.data('ui-treeview-nodemodel', nodeModel)
 				.click(eventHandlers.onNodeClick);
@@ -112,13 +114,35 @@
 			
 			if ( ! nodeModel().title.uiTreeviewManaged) {
 				nodeModel().title.on("change", function(newVal, oldVal) {
-					DOMCtx.find("> span:eq(1)").html(newVal);
+					DOMCtx.find("> span.ui-treeview-nodetitle").html(newVal);
 				});
 				nodeModel().title.uiTreeviewManaged = true;
 			}
 				
 			if (nodeModel().childNodes !== undefined && nodeModel().childNodes() !== null) {
 				this.updateNodeList(nodeModel().childNodes, DOMCtx.append('<ul></ul>').find('> ul'));
+			}
+		},
+		renderCheckboxValue: function(chkBox, value) {
+			chkBox = $(chkBox);
+			var trueClass = ["ui-icon-check"].join(" ");
+			var falseClass = ["ui-treeview-emptyicon"].join(" ");
+			var nullClass = ["ui-icon-minus", "ui-state-disabled"].join(" ");
+			if (value === undefined) {
+				value = null;
+			}
+			if (true === value) {
+				chkBox.removeClass(falseClass)
+					.removeClass(nullClass)
+					.addClass(trueClass);
+			} else if (false === value) {
+				chkBox.removeClass(trueClass)
+					.removeClass(nullClass)
+					.addClass(falseClass);
+			} else if (null === value) {
+				chkBox.removeClass(trueClass)
+					.removeClass(falseClass)
+					.addClass(nullClass)
 			}
 		},
 		fetchOptions: function(nodeDOMElem) {
@@ -140,7 +164,7 @@
 			dataSource: null,
 			closedNodeClass: 'ui-icon-carat-1-e',
 			openedNodeClass: 'ui-icon-carat-1-s',
-			leafNodeClass: 'ui-treeview-emptyleaf',
+			leafNodeClass: 'ui-treeview-emptyicon',
 			checkable: false,
 			onCheckboxChange: null,
 			bindCheckboxesTo: null
