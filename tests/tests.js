@@ -245,9 +245,9 @@ test("maintain{Child,Parent}Checkboxes", function() {
 		.parent()
 		.find("span.ui-treeview-emptyicon").length, 2);
 	
-	//$("#treeview").treeview("destroy");
+	$("#treeview").treeview("destroy");
 });
-/**
+/**/
 module("Data change handling");
 
 test("title change", function() {
