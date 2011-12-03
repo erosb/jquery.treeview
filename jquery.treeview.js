@@ -233,45 +233,51 @@
 			isConstructor = true;
 		}
 		
-		if (isConstructor) {
-			var existingOptions = $(this).data('ui-treeview-options');
-			if (existingOptions) {
-				throw "can not create multiple treeviews in the same DOM element";
-			}
+		var args = arguments;
+		
+		$(this).each(function() {
+		
+			if (isConstructor) {
+				var existingOptions = $(this).data('ui-treeview-options');
+				if (existingOptions) {
+					throw "can not create multiple treeviews in the same DOM element";
+				}
 				
-			$(this).data('ui-treeview-options', options);
+				$(this).data('ui-treeview-options', options);
 			
-			$(this).empty()
-				.addClass('ui-widget')
-				.addClass('ui-widget-content')
-				.addClass('ui-corner-all');
+				$(this).empty()
+					.addClass('ui-widget')
+					.addClass('ui-widget-content')
+					.addClass('ui-corner-all');
 
-			var model = options.dataModel;
+				var model = options.dataModel;
 			
-			if (model().title !== undefined && model().title() !== null) {
-				$(this).html('<div class="ui-widget-header ui-treeview-title">'
-					+ model().title() + '</div>');
-			}
+				if (model().title !== undefined && model().title() !== null) {
+					$(this).html('<div class="ui-widget-header ui-treeview-title">'
+						+ model().title() + '</div>');
+				}
 			
-			if (model().childNodes) {
-				$(this).append('<ul></ul>');
-				var ulTag = $(this).find('> ul');
-				privateMethods.updateNodeList(model().childNodes, ulTag);
-				$(this).find('> ul ul').hide();
-			}
+				if (model().childNodes) {
+					$(this).append('<ul></ul>');
+					var ulTag = $(this).find('> ul');
+					privateMethods.updateNodeList(model().childNodes, ulTag);
+					$(this).find('> ul ul').hide();
+				}
 			
-		} else {
-			var methodName = arguments[ 0 ];
-			if ( ! publicMethods[methodName] ) {
-				throw "treeview doesn't have method '" + methodName + "'";
-			}
+			} else {
+				var methodName = args[ 0 ];
+				if ( ! publicMethods[methodName] ) {
+					throw "treeview doesn't have method '" + methodName + "'";
+				}
 				
-			var args = [];
-			for (var i = 1; i < arguments.length; ++i) {
-				args.push( arguments[ i ] );
+				var methodArgs = [];
+				for (var i = 1; i < args.length; ++i) {
+					methodArgs.push( args[ i ] );
+				}
+				publicMethods[methodName].apply(this, methodArgs);
 			}
-			publicMethods[methodName].apply(this, args);
-		}
+		
+		});
 		
 		return this;
 	};
