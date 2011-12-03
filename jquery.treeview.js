@@ -51,12 +51,12 @@
 					, nodeModel);
 			}
 			
-			if (options.maintainParentCheckboxes) {
-				privateMethods.maintainParentCheckboxes(this, options);
-			}
-			
 			if (options.maintainChildCheckboxes) {
 				privateMethods.maintainChildCheckboxes(this, options);
+			}
+			
+			if (options.maintainParentCheckboxes) {
+				privateMethods.maintainParentCheckboxes(this, options);
 			}
 		}
 	};
@@ -64,7 +64,7 @@
 	var privateMethods = {
 		maintainParentCheckboxes: function(childChkbox, options) {
 			for (var ulTag = $(childChkbox).parent().parent()
-				;  !ulTag.parent().data("ui-treeview-options")
+				;  ! ulTag.parent().data("ui-treeview-options")
 				; ulTag = ulTag.parent().parent()) {
 				
 				var liTag = ulTag.parent();
