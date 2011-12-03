@@ -1,4 +1,4 @@
-/**
+/**/
  
 module("Basics")
 
@@ -64,7 +64,7 @@ test("Rendering testing", function() {
 	same($("#treeview > ul > li > ul > li > ul > li > span.ui-treeview-nodetitle").html(), "node 01 01 01", "recursive node rendering");
 	$("#treeview").treeview("destroy");
 });
-*/
+/**/
 test("Checkbox rendering", function() {
 	var model = $.observable({
 		title: "jquery.treeview demo",
@@ -181,11 +181,73 @@ test("onCheckboxChange", function() {
 	$("#treeview > ul > li:first > span.checkbox:first").click();
 	
 	ok(modelChanged);
-	
 	ok(called, "onCheckboxChange fired properly");
+	
 	$("#treeview").treeview("destroy");
 });
 
+test("maintain{Child,Parent}Checkboxes", function() {
+	var model = $.observable({
+		title: "jquery.treeview demo",
+		childNodes: [
+			{
+				title: 'root node 01',
+				selected: false,
+				childNodes: [
+					{
+						title: "node 01 01",
+						selected: false,
+						childNodes: [
+							{
+								title: "node 01 01 01",
+								selected: true
+							},
+							{
+								title: "node 01 01 02",
+								selected: false
+							}
+						]
+					},
+					{
+						title: "node 01 02",
+						selected: false
+					}
+				]
+			},
+			{
+				title: 'root node 02',
+				selected: true,
+				childNodes: []
+			}
+		]
+	});
+	
+	$("#treeview").treeview({
+		dataModel: model,
+		checkable: true,
+		bindCheckboxesTo: 'selected',
+	});
+	
+	$("#treeview > ul > li:first > ul > li:first > ul > li:eq(1) > .checkbox").click();
+	
+	ok($("#treeview > ul > li:first > ul > li:first > .checkbox").hasClass('ui-icon-check')
+		, "direct (true) parent rendering is correct");
+		
+	ok($("#treeview > ul > li:first > ul > li:first > .checkbox").data("ui-treeview-nodemodel")().selected()
+		, "direct (true) parent value written to model");
+	
+	ok($("#treeview > ul > li:first > .checkbox").hasClass('ui-icon-minus')
+		, "mixed parent rendering is correct");
+
+	// good question why it fails, since it is rendered properly..
+	same($("#treeview > ul > li:first > ul > li:first > .checkbox")
+		.click()
+		.parent()
+		.find("span.ui-treeview-emptyicon").length, 2);
+	
+	//$("#treeview").treeview("destroy");
+});
+/**
 module("Data change handling");
 
 test("title change", function() {

@@ -50,13 +50,54 @@
 				options.onCheckboxChange.call(this, val
 					, nodeModel);
 			}
+			
+			if (options.maintainParentCheckboxes) {
+				privateMethods.maintainParentCheckboxes(this, options);
+			}
+			
+			if (options.maintainChildCheckboxes) {
+				privateMethods.maintainChildCheckboxes(this, options);
+			}
 		}
 	};
 	
 	var privateMethods = {
-		attachEventHandlers: function(nodeModel, DOMCtx) {
-			nodeModel().title.on('change', function(newVal) {
-				$(DOMCtx).parent().find('> .ui-treeview-title').html(newVal);
+		maintainParentCheckboxes: function(childChkbox, options) {
+			for (var ulTag = $(childChkbox).parent().parent()
+				;  !ulTag.parent().data("ui-treeview-options")
+				; ulTag = ulTag.parent().parent()) {
+				
+				var liTag = ulTag.parent();
+				var targetCheckbox = liTag.find('> span.checkbox');
+				var chkboxVal = undefined;
+				ulTag.find('span.checkbox').each(function() {
+					var childVal = privateMethods.getCheckboxValue(this);
+					if (childVal === null) {
+						chkboxVal = null;
+						return false;
+					}
+					if (childVal !== chkboxVal) {
+						if (chkboxVal === undefined) {
+							chkboxVal = childVal;
+						} else {
+							chkboxVal = null;
+							return false;
+						}
+					}
+				});
+				privateMethods.renderCheckboxValue(targetCheckbox, chkboxVal);
+				if (options.bindCheckboxesTo !== null) {
+					targetCheckbox.data("ui-treeview-nodemodel")()[options.bindCheckboxesTo](chkboxVal);
+				}
+			} 
+		},
+		maintainChildCheckboxes: function(chkBox, options) {
+			var val = privateMethods.getCheckboxValue( chkBox );
+			$(chkBox).parent().find("span.checkbox").each(function() {
+				privateMethods.renderCheckboxValue(this, val);
+				if (options.bindCheckboxesTo !== null) {
+					$(this).data("ui-treeview-nodemodel")()[options.bindCheckboxesTo](val);
+				}
 			});
 		},
 		updateNodeList: function(nodeList, DOMCtx) {
@@ -93,10 +134,9 @@
 			if (options.checkable) {
 				var chkBox = DOMCtx.append('<span class="ui-icon checkbox"></span>')
 					.find('span.checkbox')
-					.data('ui-treeview-nodemodel', nodeModel);
-				if ( $.isFunction(options.onCheckboxChange) ) {
-					chkBox.click(eventHandlers.onCheckboxClick);
-				}
+					.data('ui-treeview-nodemodel', nodeModel)
+					.click(eventHandlers.onCheckboxClick);
+				
 				if (options.bindCheckboxesTo) {
 					this.renderCheckboxValue( chkBox, nodeModel()[options.bindCheckboxesTo]() );
 					nodeModel()[options.bindCheckboxesTo].on("change", function(newVal) {
@@ -110,7 +150,8 @@
 				.data('ui-treeview-nodemodel', nodeModel)
 				.click(eventHandlers.onNodeClick);
 				
-			DOMCtx.find('> span.ui-icon').click(eventHandlers.onNodeClick);
+			DOMCtx.find('> span.' + options.closedNodeClass 
+				+ ', > span.' + options.openedNodeClass).click(eventHandlers.onNodeClick);
 			
 			if ( ! nodeModel().title.uiTreeviewManaged) {
 				nodeModel().title.on("change", function(newVal, oldVal) {
@@ -145,6 +186,17 @@
 					.addClass(nullClass)
 			}
 		},
+		getCheckboxValue: function(chkBox) {
+			chkBox = $(chkBox);
+			if (chkBox.hasClass("ui-icon-check")) {
+				return true;
+			} else if (chkBox.hasClass("ui-icon-minus")) {
+				return null;
+			} else if (chkBox.hasClass("ui-treeview-emptyicon")) {
+				return false;
+			}
+			throw "failed to determine checkbox value";
+		},
 		fetchOptions: function(nodeDOMElem) {
 			var current = $(nodeDOMElem);
 			while(current) {
@@ -167,7 +219,9 @@
 			leafNodeClass: 'ui-treeview-emptyicon',
 			checkable: false,
 			onCheckboxChange: null,
-			bindCheckboxesTo: null
+			bindCheckboxesTo: null,
+			maintainParentCheckboxes: true,
+			maintainChildCheckboxes: true
 		};
 		
 		var isConstructor = false;
