@@ -98,6 +98,39 @@ test("Checkbox rendering", function() {
 	$("#treeview").treeview("destroy");
 });
 
+test("Custom node title renderer", function() {
+	var model = $.observable({
+		title: "jquery.treeview demo",
+		childNodes: [
+			{
+				title: 'root node 01',
+				childNodes: [
+					{
+						title: "node 01 01",
+						childNodes: [
+							{
+								title: "node 01 01 01"
+							}
+						]
+					}
+				]
+			},
+			{
+				title: 'root node 02',
+				childNodes: []
+			}
+		]
+	});
+	$("#treeview").treeview({
+		dataModel: model,
+		nodeRenderer: function(nodeModel) {
+			return nodeModel().title() + '---';
+		}
+	});
+	same($("#treeview > ul > li:first > .ui-treeview-nodetitle").html(), "root node 01---");
+	$("#treeview").treeview("destroy");
+});
+/**/
 module("Event handling");
 
 test("onNodeClick", function() {
@@ -247,7 +280,7 @@ test("maintain{Child,Parent}Checkboxes", function() {
 	
 	$("#treeview").treeview("destroy");
 });
-/**/
+
 module("Data change handling");
 
 test("title change", function() {

@@ -121,7 +121,6 @@
 		updateNode: function(nodeModel, DOMCtx) {
 			DOMCtx = $(DOMCtx).empty();
 			var options = this.fetchOptions(DOMCtx);
-			var title = ($.isFunction(nodeModel().title) && nodeModel().title()) || '';
 			var iconClass = null;
 			if (nodeModel().childNodes !== undefined && nodeModel().childNodes() !== null) {
 				iconClass = options.closedNodeClass;
@@ -146,7 +145,7 @@
 			}
 			DOMCtx.append('</span><span class="ui-treeview-nodetitle"></span>')
 				.find('> span.ui-treeview-nodetitle')
-				.text(title)
+				.html(options.nodeRenderer(nodeModel))
 				.data('ui-treeview-nodemodel', nodeModel)
 				.click(eventHandlers.onNodeClick);
 				
@@ -217,6 +216,10 @@
 			closedNodeClass: 'ui-icon-carat-1-e',
 			openedNodeClass: 'ui-icon-carat-1-s',
 			leafNodeClass: 'ui-treeview-emptyicon',
+			nodeRenderer: function(nodeModel) {
+				var title = ($.isFunction(nodeModel().title) && nodeModel().title()) || '';
+				return $("<div/>").text(title).html();
+			},
 			checkable: false,
 			onCheckboxChange: null,
 			bindCheckboxesTo: null,
