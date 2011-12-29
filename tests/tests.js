@@ -95,9 +95,9 @@ test("Checkbox rendering", function() {
 	
 	same($("#treeview > ul > li:first > span.checkbox").length, 1);
 	
-	//$("#treeview").treeview("destroy");
+	$("#treeview").treeview("destroy");
 });
-/*
+
 test("Custom node title renderer", function() {
 	var model = $.observable({
 		title: "jquery.treeview demo",
@@ -403,14 +403,18 @@ test("checkbox bound property change", function() {
 		checkable: true,
 		bindCheckboxesTo: 'selected',
 		nodeRenderer: function(nodeModel) {
-			var addButton = $('<input type="button" value="+"/>').click(function() {
+			var wrapper = $("<span/>");
+			var addButton = $('<input type="button" value="+"/>').click(function(e) {
 				nodeModel().childNodes.push({
-					title: "subnode"
+					title: "subnode",
+					selected: true
 				});
+				e.stopPropagation();
 			});
-			return $(nodeModel().title()).append(addButton);
+			return wrapper.append(nodeModel().title()).append(addButton)
 		}
 	});
+	//$("#treeview").treeview("destroy");
 });
 
 

@@ -2,6 +2,8 @@
 	
 	"use strict";
 	
+	var treeviewOptions = null;
+	
 	var publicMethods = {
 		destroy: function() {
 			$(this).empty().data("ui-treeview-options", null);
@@ -11,7 +13,7 @@
 	var eventHandlers = {
 		onNodeClick: function(e, ui) {
 			var childNodes = $(this).parent().find('> ul');
-			var options = privateMethods.fetchOptions(this);
+			var options = treeviewOptions;
 			if ( $.isFunction(options.onNodeClick) ) {
 				options.onNodeClick.call(this, $(this).data('ui-treeview-nodemodel'), e);
 			}
@@ -38,7 +40,7 @@
 			}
 			privateMethods.renderCheckboxValue(this, val);
 			var nodeModel = $(this).data('ui-treeview-nodemodel');
-			var options = privateMethods.fetchOptions(this);
+			var options = treeviewOptions;
 			
 			if (options.bindCheckboxesTo !== null) {
 				if ( nodeModel()[options.bindCheckboxesTo] ) {
@@ -120,7 +122,7 @@
 		},
 		updateNode: function(nodeModel, DOMCtx) {
 			DOMCtx = $(DOMCtx).empty();
-			var options = this.fetchOptions(DOMCtx);
+			var options = treeviewOptions;
 			var iconClass = null;
 			if (nodeModel().childNodes !== undefined && nodeModel().childNodes() !== null) {
 				iconClass = options.closedNodeClass;
@@ -128,15 +130,14 @@
 				iconClass = options.leafNodeClass;
 			}
 			
-			var iconSpan = $('<span class="ui-icon ' + iconClass + '" style="display:inline-block"></span>');
+			DOMCtx.append('<span class="ui-icon ' + iconClass + '" style="display:inline-block"></span>');
 			
 			if (options.checkable) {
 				var chkBox = $('<span class="ui-icon checkbox"></span>')
 					.data('ui-treeview-nodemodel', nodeModel)
 					.click(eventHandlers.onCheckboxClick);
 					
-				iconSpan.append(chkBox);
-				console.log(iconSpan)
+				DOMCtx.append(chkBox);
 				
 				if (options.bindCheckboxesTo) {
 					this.renderCheckboxValue( chkBox, nodeModel()[options.bindCheckboxesTo]() );
@@ -145,7 +146,7 @@
 					});
 				}
 			}
-			DOMCtx.append(iconSpan);
+			
 			DOMCtx.append('<span class="ui-treeview-nodetitle"></span>')
 				.find('> span.ui-treeview-nodetitle')
 				.html(options.nodeRenderer(nodeModel))
@@ -238,6 +239,8 @@
 		} else if (arguments.length === 0) {
 			isConstructor = true;
 		}
+		
+		treeviewOptions = options;
 		
 		var args = arguments;
 		
