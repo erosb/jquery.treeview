@@ -104,7 +104,7 @@
 		},
 		updateNodeList: function(nodeList, DOMCtx) {
 			DOMCtx = $(DOMCtx).empty();
-			if ( ! nodeList.uiTreeviewManaged) {
+			if ( ! nodeList.uiTreeviewManaged || ! DOMCtx.get(0).uiTreeviewManaged ) {
 				nodeList.on(["push"
 					, "elemchange"
 					, "pop"
@@ -115,6 +115,7 @@
 						privateMethods.updateNodeList(nodeList, DOMCtx);
 					});
 				nodeList.uiTreeviewManaged = true;
+				DOMCtx.get(0).uiTreeviewManaged = true;
 			}
 			for (var i = 0; i < nodeList().length; ++i) {
 				this.updateNode( nodeList(i), DOMCtx.append('<li style="list-style-type: none"></li>').find('li:last') );

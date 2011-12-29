@@ -400,14 +400,15 @@ test("checkbox bound property change", function() {
 	
 	$("#treeview").treeview({
 		dataModel: model,
-		checkable: true,
+		//checkable: true,
 		bindCheckboxesTo: 'selected',
 		nodeRenderer: function(nodeModel) {
 			var wrapper = $("<span/>");
 			var addButton = $('<input type="button" value="+"/>').click(function(e) {
 				nodeModel().childNodes.push({
 					title: "subnode",
-					selected: true
+					selected: true,
+					childNodes: []
 				});
 				e.stopPropagation();
 			});
