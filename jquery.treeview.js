@@ -128,13 +128,15 @@
 				iconClass = options.leafNodeClass;
 			}
 			
-			DOMCtx.append('<span class="ui-icon ' + iconClass + '" style="display:inline-block">');
+			var iconSpan = $('<span class="ui-icon ' + iconClass + '" style="display:inline-block"></span>');
 			
 			if (options.checkable) {
-				var chkBox = DOMCtx.append('<span class="ui-icon checkbox"></span>')
-					.find('span.checkbox')
+				var chkBox = $('<span class="ui-icon checkbox"></span>')
 					.data('ui-treeview-nodemodel', nodeModel)
 					.click(eventHandlers.onCheckboxClick);
+					
+				iconSpan.append(chkBox);
+				console.log(iconSpan)
 				
 				if (options.bindCheckboxesTo) {
 					this.renderCheckboxValue( chkBox, nodeModel()[options.bindCheckboxesTo]() );
@@ -143,7 +145,8 @@
 					});
 				}
 			}
-			DOMCtx.append('</span><span class="ui-treeview-nodetitle"></span>')
+			DOMCtx.append(iconSpan);
+			DOMCtx.append('<span class="ui-treeview-nodetitle"></span>')
 				.find('> span.ui-treeview-nodetitle')
 				.html(options.nodeRenderer(nodeModel))
 				.data('ui-treeview-nodemodel', nodeModel)

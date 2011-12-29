@@ -95,9 +95,9 @@ test("Checkbox rendering", function() {
 	
 	same($("#treeview > ul > li:first > span.checkbox").length, 1);
 	
-	$("#treeview").treeview("destroy");
+	//$("#treeview").treeview("destroy");
 });
-
+/*
 test("Custom node title renderer", function() {
 	var model = $.observable({
 		title: "jquery.treeview demo",
@@ -130,7 +130,7 @@ test("Custom node title renderer", function() {
 	same($("#treeview > ul > li:first > .ui-treeview-nodetitle").html(), "root node 01---");
 	$("#treeview").treeview("destroy");
 });
-/**/
+
 module("Event handling");
 
 test("onNodeClick", function() {
@@ -373,8 +373,46 @@ test("checkbox bound property change", function() {
 	
 	ok($("#treeview  span.checkbox:first").hasClass("ui-icon-check"), "true val rendered properly");
 	
-	//$("#treeview").treeview("destroy");
+	$("#treeview").treeview("destroy");
 });
+
+test("checkbox bound property change", function() {
+	var model = $.observable({
+		title: "jquery.treeview demo",
+		childNodes: [
+			{
+				title: 'root node 01',
+				selected: true,
+				childNodes: []
+			},
+			{
+				title: "root node 02",
+				selected: false,
+				childNodes: []
+			},
+			{
+				title: 'root node 03',
+				selected: null,
+				childNodes: []
+			}
+		],
+	});
+	
+	$("#treeview").treeview({
+		dataModel: model,
+		checkable: true,
+		bindCheckboxesTo: 'selected',
+		nodeRenderer: function(nodeModel) {
+			var addButton = $('<input type="button" value="+"/>').click(function() {
+				nodeModel().childNodes.push({
+					title: "subnode"
+				});
+			});
+			return $(nodeModel().title()).append(addButton);
+		}
+	});
+});
+
 
 
 /**/
