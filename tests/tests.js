@@ -94,6 +94,8 @@ test("Checkbox rendering", function() {
 	});
 	
 	same($("#treeview > ul > li:first > span.checkbox").length, 1);
+	ok($("#treeview > ul > li:first > span.checkbox").hasClass("ui-treeview-emptyicon")
+			, "initial empty icon shown");
 	
 	$("#treeview").treeview("destroy");
 });

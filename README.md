@@ -34,7 +34,7 @@ Let's create a simple treeview with 2 root nodes and nothing else:
 		dataModel: model
 	});	
 	</script>
-	<div id="#treeview"></div>
+	<div id="treeview"></div>
 	
 In the data model every node must have a property named 'title' and if it has
 childnodes, then the childnodes must be in an array property named 'childNodes'.

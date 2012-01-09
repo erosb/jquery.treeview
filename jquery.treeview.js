@@ -145,6 +145,8 @@
 					nodeModel()[options.bindCheckboxesTo].on("change", function(newVal) {
 						privateMethods.renderCheckboxValue(chkBox, newVal);
 					});
+				} else {
+					this.renderCheckboxValue( chkBox, false );
 				}
 			}
 			
