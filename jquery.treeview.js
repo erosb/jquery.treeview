@@ -12,6 +12,7 @@
 	
 	var eventHandlers = {
 		onNodeClick: function(e, ui) {
+			console.log("onNodeClick", $(ui).data("handledByStop"));
 			var childNodes = $(this).parent().find('> ul');
 			var options = treeviewOptions;
 			if ( $.isFunction(options.onNodeClick) ) {
@@ -119,7 +120,31 @@
 			}
 			for (var i = 0; i < nodeList().length; ++i) {
 				this.updateNode( nodeList(i), DOMCtx.append('<li style="list-style-type: none"></li>').find('li:last') );
-			}	
+			}
+			var options = treeviewOptions;
+			if (options.sortOptions !== null) {
+				DOMCtx.sortable(options.sortOptions);				
+				DOMCtx.on("sortstart", function(event, ui) {
+					ui.item.data("jquery-treeview-startidx", ui.item.index());
+				}).on("sortstop", function(event, ui) {
+					var oldIdx = ui.item.data("jquery-treeview-startidx");
+					if (oldIdx === undefined)
+						return;
+							
+					var newIdx = ui.item.index();
+					var diff = newIdx < oldIdx ? -1 : 1;
+					for (var i = oldIdx; i != newIdx; i += diff) {
+						if (options.bindOrderTo !== null) {
+							var propSwap = nodeList(i + diff)()[options.bindOrderTo]();
+							nodeList(i + diff)()[options.bindOrderTo](nodeList(i)()[options.bindOrderTo]());
+							nodeList(i)()[options.bindOrderTo](propSwap);
+						}
+						var posSwap = nodeList(i + diff)();
+						nodeList(i + diff, nodeList(i)());
+						nodeList(i, posSwap);
+					}
+				});
+			}
 		},
 		updateNode: function(nodeModel, DOMCtx) {
 			DOMCtx = $(DOMCtx).empty();
@@ -230,6 +255,8 @@
 			checkable: false,
 			onCheckboxChange: null,
 			bindCheckboxesTo: null,
+			sortOptions: null,
+			bindOrderTo: null,
 			maintainParentCheckboxes: true,
 			maintainChildCheckboxes: true
 		};

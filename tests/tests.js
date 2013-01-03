@@ -417,7 +417,46 @@ test("checkbox bound property change", function() {
 			return wrapper.append(nodeModel().title()).append(addButton)
 		}
 	});
-	//$("#treeview").treeview("destroy");
+	$("#treeview").treeview("destroy");
+});
+
+test("sorting", function() {
+	var model = $.observable({
+		title: "jquery.treeview demo",
+		childNodes: [
+			{
+				title: 'root node 01',
+				order: 1,
+				childNodes: [
+					{title: "node 01 01", "order": 0},
+					{title: "node 01 02", "order": 1},
+					{title: "node 01 03", "order": 2}
+				]
+			},
+			{
+				title: "root node 02",
+				order: 2,
+				childNodes: [
+					{title: "node 02 01", "order": 0},
+					{title: "node 02 02", "order": 1}
+				]
+			},
+			{
+				title: 'root node 03',
+				order: 3,
+				childNodes: [
+					{title: "node 03 01", "order": 0},
+					{title: "node 03 02", "order": 1}
+				]
+			}
+		],
+	});
+	$("#treeview").treeview({
+		checkable: true,
+		dataModel: model,
+		sortOptions: {},
+		bindOrderTo: "order"
+	});
 });
 
 

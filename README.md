@@ -184,8 +184,76 @@ The maintenance process won't fire the 'onCheckboxChange' event on the automatic
 checkboxes.
 
 The parent- and childnode maintenance can be turned off by setting both 'maintainParentCheckboxes'
-and 'maintainChildCheckboxes' properties in the constructor to 'false' .
+and 'maintainChildCheckboxes' properties in the constructor to 'false'.
 
+Sortable trees
+--------------
+
+jquery.treeview supports sortable trees. By "sortable" I mean the direct childnodes of every
+node can be sortable (by taking the advantage of <a href="http://api.jqueryui.com/sortable/">jquery.sortable</a>),
+but currently it is not possible to move a node to an other subtree my drag & drop. So let's see the syntax:
+
+	$("#treeview").treeview({
+		dataModel: model,
+		sortOptions: {},
+	});
+	
+You can enable the sorting by adding a 'sortOptions' key to the constructor object. Its value
+must be an object, containing the options to be passed to the 'jquery.sortable()' constructor.
+In the above example it is just an empty object.
+
+With the above setup jquery.treeview will call jquery.sortable() on every childnode-list. When
+the user changes the ordering of the childnodes by drag & drop, then the childnodes in the dataModel
+will also be swapped automatically.
+
+If you want to store the ordering in the childnode objects themselves too, you should use the
+'bindOrderTo' option of the treeview. If you specify this option (must be a string) then you bind
+the ordering to the given property of the childnode objects. This property will be maintained by
+jquery.treeview Example (we use the 'order' property here for storing the order):
+
+	var model = $.observable({
+	title: "jquery.treeview demo",
+	childNodes: [
+		{
+			title: 'root node 01',
+			order: 1,
+			childNodes: [
+				{title: "node 01 01", "order": 0},
+				{title: "node 01 02", "order": 1},
+				{title: "node 01 03", "order": 2}
+			]
+		},
+		{
+			title: "root node 02",
+			order: 2,
+			childNodes: [
+				{title: "node 02 01", "order": 0},
+				{title: "node 02 02", "order": 1}
+			]
+		},
+		{
+			title: 'root node 03',
+			order: 3,
+			childNodes: [
+				{title: "node 03 01", "order": 0},
+				{title: "node 03 02", "order": 1}
+			]
+		}
+	],
+	);
+	$("#treeview").treeview({
+		checkable: true,
+		dataModel: model,
+		sortOptions: {},
+		bindOrderTo: "order"
+	});
+
+With this setup if the user swaps for example 'node 01 01' and 'node 01 02' then two things
+will happen:
+
+ * in the 'childNodes' array of 'root node 01' the position 'node 01 01' and 'node 01 02' will be swapped
+ * the 'order' value of 'node 01 01' will be changed to 1
+ * the 'order' value of 'node 01 02' will be changed to 0
 
 Destroying the treeview control
 -------------------------------
